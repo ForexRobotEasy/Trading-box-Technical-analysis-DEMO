@@ -1,0 +1,153 @@
+mql5
+#include <Trade\Trade.mqh>
+#include <ChartObjects\ChartObjects.mqh>
+#include <Notifications\Notifiers\PushNotification.mqh>
+#include <Notifications\Notifiers\EmailNotification.mqh>
+
+// Developer's site: forexroboteasy.com
+// Development: Forex Robot Easy Team
+
+// Global variables
+CChartObjectContainer objects; // Container for chart objects
+CTrade trade; // Trade class
+CPushNotification pushNotification; // Push notification class
+CEmailNotification emailNotification; // Email notification class
+
+// Function to draw rectangles on the chart
+void DrawRectangles()
+{
+    // Draw rectangles on the chart to represent supply demand zones
+    // Rectangle coordinates and properties
+    CRectangleObject rectangle;
+    rectangle.Create(0, 1.20, 0, 1.30);
+    rectangle.Color = clrGreen;
+    rectangle.Back = true;
+    rectangle.FillColor = clrGreen;
+    objects.Add(rectangle);
+
+    rectangle.Create(0, 1.40, 0, 1.50);
+    rectangle.Color = clrRed;
+    rectangle.Back = true;
+    rectangle.FillColor = clrRed;
+    objects.Add(rectangle);
+}
+
+// Function to draw trendlines on the chart
+void DrawTrendlines()
+{
+    // Draw trendlines on the chart to represent support resistance lines
+    // Trendline coordinates and properties
+    CTrendlineObject trendline;
+    trendline.Create(0, 1.25, 10, 1.35);
+    trendline.Color = clrBlue;
+    objects.Add(trendline);
+
+    trendline.Create(0, 1.45, 10, 1.55);
+    trendline.Color = clrMagenta;
+    objects.Add(trendline);
+}
+
+// Function to send mobile or email notifications
+void SendNotifications()
+{
+    // Check for market movements or specific conditions
+    bool marketMovement = true;
+    bool specificCondition = true;
+
+    // Send mobile notification if there is a market movement
+    if (marketMovement)
+    {
+        pushNotification.Send('Market movement detected!');
+    }
+
+    // Send email notification if specific condition is met
+    if (specificCondition)
+    {
+        emailNotification.Send('Specific condition is met!');
+    }
+}
+
+// Function to extend rectangles and trendlines into the future
+void ExtendObjects()
+{
+    // Extend rectangles and trendlines into the future based on user input
+    CDateTime futureTime = TimeCurrent() + 3600; // Extend by 1 hour
+
+    // Extend rectangles into the future
+    CRectangleObject rectangle = objects.GetByIndex(0);
+    rectangle.Time = futureTime;
+    objects.Update(rectangle);
+
+    rectangle = objects.GetByIndex(1);
+    rectangle.Time = futureTime;
+    objects.Update(rectangle);
+
+    // Extend trendlines into the future
+    CTrendlineObject trendline = objects.GetByIndex(2);
+    trendline.Time[1] = futureTime;
+    objects.Update(trendline);
+
+    trendline = objects.GetByIndex(3);
+    trendline.Time[1] = futureTime;
+    objects.Update(trendline);
+}
+
+// Entry point of the program
+int OnInit()
+{
+    // Draw rectangles on the chart
+    DrawRectangles();
+
+    // Draw trendlines on the chart
+    DrawTrendlines();
+
+    // Send notifications
+    SendNotifications();
+
+    // Extend objects into the future
+    ExtendObjects();
+
+    return(INIT_SUCCEEDED);
+}
+
+// Program execution starts here
+void OnStart()
+{
+    // Main program loop
+    while (!IsStopped())
+    {
+        // Check for user input or market conditions
+        // Execute trading functions based on user input or market conditions
+        bool manualDrawing = true;
+        bool setAlert = true;
+
+        // Manually draw rectangles on the chart
+        if (manualDrawing)
+        {
+            // User input or mouse click event to draw rectangles
+            objects.SelectByIndex(0);
+            objects.DrawSelected();
+        }
+
+        // Manually draw trendlines on the chart
+        if (manualDrawing)
+        {
+            // User input or mouse click event to draw trendlines
+            objects.SelectByIndex(2);
+            objects.DrawSelected();
+        }
+
+        // Set alerts for specific market conditions or price levels
+        if (setAlert)
+        {
+            // User input or condition to set alerts
+            trade.Alert('Alert triggered!');
+        }
+
+        // Extend rectangles and trendlines into the future based on user input
+        ExtendObjects();
+
+        // Sleep to reduce CPU usage
+        Sleep(1000);
+    }
+}
